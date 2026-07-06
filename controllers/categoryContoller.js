@@ -1,6 +1,7 @@
 const slugify = require("slugify");
 
 const Category = require("../models/categoryModel");
+const ApiError = require("../utils/apiError");
 
 exports.getAllCategories = async (req, res) => {
   const page = +req.query.page || 1;

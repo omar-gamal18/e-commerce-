@@ -2,6 +2,7 @@ const express = require("express");
 const morgan = require("morgan");
 require("dotenv").config();
 
+const globalError = require("./utils/apiError");
 const categoryRouter = require("./routes/categoryRoutes");
 
 const app = express();
@@ -13,5 +14,6 @@ if (process.env.NODE_ENV === "development") {
 }
 
 app.use("/api/v1/categories", categoryRouter);
+app.use(globalError);
 
 module.exports = app;
