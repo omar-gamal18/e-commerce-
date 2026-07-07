@@ -21,7 +21,7 @@ exports.getCategory = async (req, res, next) => {
   const category = await Category.findById(req.params.id);
 
   if (!category) {
-    return next(ApiError("No Category With This Id", 404));
+    return next(new ApiError("No Category With This Id", 404));
   }
 
   res.status(200).json({
@@ -57,7 +57,7 @@ exports.updateCategory = async (req, res, next) => {
   );
 
   if (!category) {
-    return next(ApiError("No Category With This Id", 404));
+    return next(new ApiError("No Category With This Id", 404));
   }
 
   res.status(200).json({
@@ -66,11 +66,11 @@ exports.updateCategory = async (req, res, next) => {
   });
 };
 
-exports.deleteCategory = async (req, res) => {
+exports.deleteCategory = async (req, res, next) => {
   const category = await Category.findByIdAndDelete(req.params.id);
 
   if (!category) {
-    return next(ApiError("No Category With This Id", 404));
+    return next(new ApiError("No Category With This Id", 404));
   }
 
   res.status(204).send();
