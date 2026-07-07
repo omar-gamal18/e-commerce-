@@ -17,14 +17,11 @@ exports.getAllCategories = async (req, res) => {
   });
 };
 
-exports.getCategory = async (req, res) => {
+exports.getCategory = async (req, res, next) => {
   const category = await Category.findById(req.params.id);
 
   if (!category) {
-    return res.status(404).json({
-      status: "fail",
-      message: "No Category With This Id",
-    });
+    return next(ApiError("No Category With This Id", 404));
   }
 
   res.status(200).json({
@@ -33,7 +30,7 @@ exports.getCategory = async (req, res) => {
   });
 };
 
-exports.createCategory = async (req, res) => {
+exports.createCategory = async (req, res, next) => {
   const { name } = req.body;
 
   const category = await Category.create({
@@ -47,7 +44,7 @@ exports.createCategory = async (req, res) => {
   });
 };
 
-exports.updateCategory = async (req, res) => {
+exports.updateCategory = async (req, res, next) => {
   const { name } = req.body;
 
   const category = await Category.findByIdAndUpdate(
@@ -60,10 +57,7 @@ exports.updateCategory = async (req, res) => {
   );
 
   if (!category) {
-    return res.status(404).json({
-      status: "fail",
-      message: "No Category With This Id",
-    });
+    return next(ApiError("No Category With This Id", 404));
   }
 
   res.status(200).json({
@@ -76,11 +70,8 @@ exports.deleteCategory = async (req, res) => {
   const category = await Category.findByIdAndDelete(req.params.id);
 
   if (!category) {
-    return res.status(404).json({
-      status: "fail",
-      message: "No Category With This Id",
-    });
+    return next(ApiError("No Category With This Id", 404));
   }
 
-  res.status(204);
+  res.status(204).send();
 };
