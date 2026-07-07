@@ -1,23 +1,46 @@
 const ApiError = require("../utils/apiError");
 
+const handleCastErrorDB = (err) => {
+  return new ApiError(`Invalid path ${err.path}: ${err.value}`, 400);
+};
+
 const globalError = (err, req, res, next) => {
-  let error = { ...err };
-  error.message = err.message;
-  error.statusCode = err.statusCode || 500;
-  error.status = err.status || "error";
+  err.statusCode = err.statusCode || 500;
+  err.status = err.status || "error";
 
-  // Mongoose invalid ObjectId formatting error
-  if (err.name === "CastError") {
-    error.message = `Invalid ${err.path}: ${err.value}`;
-    error.statusCode = 400;
-    error.status = "fail";
+  if (process.env.NODE_ENV === "development") {
+    sendErrorForDev(err, res);
+  } else {
+    let error = { ...err };
+    error.message = err.message;
+
+    if (err.name === "CastError") error = handleCastErrorDB(error);
+
+    sendErrorForProd(error, res);
   }
+};
 
-  return res.status(error.statusCode).json({
-    status: error.status,
-    error: error,
-    message: error.message,
+const sendErrorForDev = (err, res) => {
+  return res.status(err.statusCode).json({
+    status: err.status,
+    error: err,
+    message: err.message,
     stack: err.stack,
+  });
+};
+
+const sendErrorForProd = (err, res) => {
+  // Operational, trusted error: send message to client
+  if (err.isOperational) {
+    return res.status(err.statusCode).json({
+      status: err.status,
+      message: err.message,
+    });
+  }
+  // Programming or other unknown error: don't leak error details
+  return res.status(500).json({
+    status: "error",
+    message: "Something went wrong!",
   });
 };
 
