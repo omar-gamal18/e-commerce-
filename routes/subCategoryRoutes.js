@@ -12,14 +12,16 @@ const {
   getSubCategory,
   updateSubCategory,
   deleteSubCategory,
+  setCategoryIdToBody,
+  createFilterObj,
 } = require("../controllers/subCategoryController");
 
 const router = express.Router({ mergeParams: true });
 
 router
   .route("/")
-  .get(getAllSubCategories)
-  .post(createSubCategoryValidator, createSubCategory);
+  .get(createFilterObj, getAllSubCategories)
+  .post(setCategoryIdToBody, createSubCategoryValidator, createSubCategory);
 
 router
   .route("/:id")
