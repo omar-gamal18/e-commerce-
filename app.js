@@ -3,7 +3,7 @@ const morgan = require("morgan");
 require("dotenv").config();
 
 const globalError = require("./middlewares/errorMiddleware");
-const apiError = require("./utils/apiError");
+const ApiError = require("./utils/apiError");
 const categoryRouter = require("./routes/categoryRoutes");
 const subCategoryRouter = require("./routes/subCategoryRoutes");
 
@@ -19,7 +19,7 @@ app.use("/api/v1/categories", categoryRouter);
 app.use("/api/v1/subcategories", subCategoryRouter);
 
 app.all("/*handle404", (req, res, next) => {
-  next(new apiError("cann't find this route", 404));
+  next(new ApiError("cann't find this route", 404));
 });
 
 app.use(globalError);
