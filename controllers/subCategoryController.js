@@ -8,7 +8,13 @@ exports.getAllSubCategories = async (req, res) => {
   const limit = +req.query.limit || 10;
   const skip = (page - 1) * limit;
 
-  const subCategories = await SubCategory.find().skip(skip).limit(limit);
+  let filterObj = {};
+  if (req.params.categoryId) filterObj = { category: req.params.categoryId };
+
+  const subCategories = await SubCategory.find(filterObj)
+    .skip(skip)
+    .limit(limit)
+    .populate({ path: "category", select: "name -_id" });
 
   res.status(200).json({
     status: "success",
@@ -45,7 +51,7 @@ exports.createSubCategory = async (req, res, next) => {
   });
 };
 
-exports.updateCategory = async (req, res, next) => {
+exports.updateSubCategory = async (req, res, next) => {
   const { name, category } = req.body;
 
   const subCategory = await SubCategory.findByIdAndUpdate(
@@ -67,7 +73,7 @@ exports.updateCategory = async (req, res, next) => {
   });
 };
 
-exports.deleteCategory = async (req, res, next) => {
+exports.deleteSubCategory = async (req, res, next) => {
   const subCategory = await SubCategory.findByIdAndDelete(req.params.id);
 
   if (!subCategory) {

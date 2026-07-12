@@ -16,6 +16,10 @@ const {
 
 const router = express.Router();
 
+const subCategoryRouter = require("./subCategoryRoutes");
+
+router.use("/:categoryId/subcategories", subCategoryRouter);
+
 router
   .route("/")
   .get(getAllCategories)
