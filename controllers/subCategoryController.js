@@ -44,3 +44,35 @@ exports.createSubCategory = async (req, res, next) => {
     data: { subCategory },
   });
 };
+
+exports.updateCategory = async (req, res, next) => {
+  const { name, category } = req.body;
+
+  const subCategory = await SubCategory.findByIdAndUpdate(
+    req.params.id,
+    { name, slug: slugify(name), category },
+    {
+      new: true,
+      runValidators: true,
+    },
+  );
+
+  if (!subCategory) {
+    return next(new ApiError("No subCategory With This Id", 404));
+  }
+
+  res.status(200).json({
+    status: "success",
+    data: { subCategory },
+  });
+};
+
+exports.deleteCategory = async (req, res, next) => {
+  const subCategory = await SubCategory.findByIdAndDelete(req.params.id);
+
+  if (!subCategory) {
+    return next(new ApiError("No subCategory With This Id", 404));
+  }
+
+  res.status(204).send();
+};
