@@ -7,18 +7,18 @@ const {
 } = require("../utils/validators/categoryValidator");
 
 const {
-  getCategories,
+  getAllCategories,
   getCategory,
   createCategory,
   updateCategory,
   deleteCategory,
-} = require("../controllers/categoryContoller");
+} = require("../controllers/categoryController");
 
 const router = express.Router();
 
 router
   .route("/")
-  .get(getCategories)
+  .get(getAllCategories)
   .post(createCategoryValidator, createCategory);
 router
   .route("/:id")
