@@ -10,6 +10,7 @@ const brandRoute = require("./routes/brandRoutes");
 const productRoute = require("./routes/productRoutes");
 
 const app = express();
+app.set("query parser", "extended");
 app.use(express.json());
 
 if (process.env.NODE_ENV === "development") {
