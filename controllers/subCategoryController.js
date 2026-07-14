@@ -2,6 +2,7 @@ const slugify = require("slugify");
 
 const SubCategory = require("../models/subCategoryModel");
 const ApiError = require("../utils/apiError");
+const ApiFeatures = require("../utils/apiFeatures");
 
 exports.createFilterObj = (req, res, next) => {
   let filterObj = {};
@@ -13,18 +14,21 @@ exports.createFilterObj = (req, res, next) => {
 };
 
 exports.getAllSubCategories = async (req, res) => {
-  const page = +req.query.page || 1;
-  const limit = +req.query.limit || 10;
-  const skip = (page - 1) * limit;
+  const documentCounts = await SubCategory.countDocuments();
+  const apiFeatures = new ApiFeatures(SubCategory.find(), req.query)
+    .paginate(documentCounts)
+    .filter()
+    .search()
+    .sort()
+    .limitFields();
 
-  const subCategories = await SubCategory.find(req.filterObject)
-    .skip(skip)
-    .limit(limit)
-    .populate({ path: "category", select: "name -_id" });
+  const { mongooseQuery, paginationResult } = apiFeatures;
+
+  const subCategories = await mongooseQuery;
 
   res.status(200).json({
-    status: "success",
     results: subCategories.length,
+    paginationResult,
     data: { subCategories },
   });
 };

@@ -1,28 +1,25 @@
 const slugify = require("slugify");
 const ApiError = require("../utils/apiError");
+const ApiFeatures = require("../utils/apiFeatures");
 
 const Product = require("../models/productModel");
 
 exports.getProducts = async (req, res) => {
-  const page = req.query.page * 1 || 1;
-  const limit = req.query.limit * 1 || 20;
-  const skip = (page - 1) * limit;
+  const documentCounts = await Product.countDocuments();
+  const apiFeatures = new ApiFeatures(Product.find(), req.query)
+    .paginate(documentCounts)
+    .filter()
+    .search("Products")
+    .sort()
+    .limitFields();
 
-  let mongooseQuery = Product.find(JSON.parse(queryStr))
-    .skip(skip)
-    .limit(limit)
-    .populate({ path: "category", select: "name -_id" });
-
-  if (req.query.fields) {
-    const field = req.query.fields.split(",").join(" ");
-    mongooseQuery = mongooseQuery.select(field);
-  } else {
-    mongooseQuery = mongooseQuery.select("-__v");
-  }
+  const { mongooseQuery, paginationResult } = apiFeatures;
 
   const products = await mongooseQuery;
 
-  res.status(200).json({ results: products.length, page, data: products });
+  res
+    .status(200)
+    .json({ results: products.length, paginationResult, data: { products } });
 };
 
 exports.getProduct = async (req, res, next) => {
