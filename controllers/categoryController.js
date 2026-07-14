@@ -1,7 +1,7 @@
 const Category = require("../models/categoryModel");
 const Factory = require("./handlersFactory");
 
-exports.getCategoryies = Factory.getAll(Category);
+exports.getAllCategories = Factory.getAll(Category);
 exports.getCategory = Factory.getOne(Category);
 exports.createCategory = Factory.createOne(Category);
 exports.updateCategory = Factory.updateOne(Category);

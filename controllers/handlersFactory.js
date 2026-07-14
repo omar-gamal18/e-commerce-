@@ -3,7 +3,7 @@ const ApiFeatures = require("../utils/apiFeatures");
 
 exports.getAll =
   (Model, modelName = "") =>
-  async (req, res) => {
+  async (req, res, next) => {
     let filter = {};
     if (req.filterObj) {
       filter = req.filterObj;

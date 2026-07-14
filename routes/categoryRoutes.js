@@ -1,4 +1,6 @@
 const express = require("express");
+// eslint-disable-next-line import/no-extraneous-dependencies
+
 const {
   getCategoryValidator,
   createCategoryValidator,
@@ -18,12 +20,13 @@ const router = express.Router();
 
 const subCategoryRouter = require("./subCategoryRoutes");
 
-router.use("/:categoryId/subcategories", subCategoryRouter);
-
 router
   .route("/")
   .get(getAllCategories)
   .post(createCategoryValidator, createCategory);
+
+router.use("/:categoryId/subcategories", subCategoryRouter);
+
 router
   .route("/:id")
   .get(getCategoryValidator, getCategory)
