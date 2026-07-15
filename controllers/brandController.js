@@ -7,7 +7,7 @@ const Brand = require("../models/brandModel");
 exports.uploadBrandImage = uploadSingleImage("image");
 
 exports.resizeImage = async (req, res, next) => {
-  const fileName = `category-${Date.now()}.jpeg`;
+  const fileName = `brand-${Date.now()}.jpeg`;
   await sharp(req.file.buffer)
     .resize(600, 600)
     .toFormat("jpeg")
