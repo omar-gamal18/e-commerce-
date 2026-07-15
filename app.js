@@ -1,7 +1,9 @@
+const path = require("path");
+
 const express = require("express");
 const morgan = require("morgan");
-require("dotenv").config();
 
+require("dotenv").config();
 const globalError = require("./middlewares/errorMiddleware");
 const ApiError = require("./utils/apiError");
 const categoryRouter = require("./routes/categoryRoutes");
@@ -12,6 +14,7 @@ const productRoute = require("./routes/productRoutes");
 const app = express();
 app.set("query parser", "extended");
 app.use(express.json());
+app.use(express.static(path.join(__dirname, "uploads")));
 
 if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
