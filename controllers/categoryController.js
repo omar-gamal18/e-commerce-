@@ -1,10 +1,10 @@
 const multer = require("multer");
-const path = require("path");
+const sharp = require("sharp");
 
 const ApiError = require("../utils/apiError");
 const Category = require("../models/categoryModel");
 const Factory = require("./handlersFactory");
-
+/* 
 const multerStorage = multer.diskStorage({
   destination: function (req, file, cb) {
     cb(null, path.join(__dirname, "..", "uploads", "categories"));
@@ -14,7 +14,9 @@ const multerStorage = multer.diskStorage({
     cb(null, `category-${Date.now()}.${ext}`);
   },
 });
+ */
 
+const multerStorage = multer.memoryStorage();
 const fileFilter = (req, file, cb) => {
   if (file.mimetype.startsWith("image")) {
     cb(null, true);
@@ -26,6 +28,16 @@ const fileFilter = (req, file, cb) => {
 const upload = multer({ storage: multerStorage, fileFilter });
 
 exports.uploadCategoryImage = upload.single("image");
+
+exports.resizeImage = async (req, res, next) => {
+  await sharp(req.file.buffer)
+    .resize(600, 600)
+    .toFormat("jpeg")
+    .jpeg({ quality: 90 })
+    .toFile(`uploads/categories/category-${Date.now()}.jpeg`);
+
+  next();
+};
 
 exports.getAllCategories = Factory.getAll(Category);
 exports.getCategory = Factory.getOne(Category);
