@@ -12,6 +12,7 @@ const {
   getUser,
   createUser,
   updateUser,
+  changeUserPassword,
   deleteUser,
   uploadUserImage,
   resizeImage,
@@ -19,7 +20,11 @@ const {
 
 const router = express.Router();
 
-router.patch("/changeMyPassword/:id", changeUserPasswordValidator);
+router.patch(
+  "/changeMyPassword/:id",
+  changeUserPasswordValidator,
+  changeUserPassword,
+);
 
 router
   .route("/")

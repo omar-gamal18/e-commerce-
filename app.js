@@ -11,6 +11,7 @@ const subCategoryRouter = require("./routes/subCategoryRoutes");
 const brandRoute = require("./routes/brandRoutes");
 const productRoute = require("./routes/productRoutes");
 const userRoute = require("./routes/userRoutes");
+const authRote = require("./routes/authRotes");
 
 const app = express();
 app.set("query parser", "extended");
@@ -27,6 +28,7 @@ app.use("/api/v1/subcategories", subCategoryRouter);
 app.use("/api/v1/brands", brandRoute);
 app.use("/api/v1/products", productRoute);
 app.use("/api/v1/users", userRoute);
+app.use("/api/v1/auth", authRote);
 
 app.all("/*handle404", (req, res, next) => {
   next(new ApiError("cann't find this route", 404));
