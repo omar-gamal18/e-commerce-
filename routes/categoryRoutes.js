@@ -27,9 +27,9 @@ router
   .route("/")
   .get(getAllCategories)
   .post(
+    createCategoryValidator,
     uploadCategoryImage,
     resizeImage,
-    createCategoryValidator,
     createCategory,
   );
 
@@ -37,9 +37,9 @@ router
   .route("/:id")
   .get(getCategoryValidator, getCategory)
   .patch(
+    updateCategoryValidator,
     uploadCategoryImage,
     resizeImage,
-    updateCategoryValidator,
     updateCategory,
   )
   .delete(deleteCategoryValidator, deleteCategory);

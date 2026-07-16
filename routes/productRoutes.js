@@ -22,18 +22,18 @@ router
   .route("/")
   .get(getAllProducts)
   .post(
+    createProductValidator,
     uploadProductsImages,
     resizeProductsImages,
-    createProductValidator,
     createProduct,
   );
 router
   .route("/:id")
   .get(getProductValidator, getProduct)
   .patch(
+    updateProductValidator,
     uploadProductsImages,
     resizeProductsImages,
-    updateProductValidator,
     updateProduct,
   )
   .delete(deleteProductValidator, deleteProduct);
