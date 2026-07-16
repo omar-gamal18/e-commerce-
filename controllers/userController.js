@@ -59,6 +59,7 @@ exports.changeUserPassword = async (req, res, next) => {
     },
     {
       new: true,
+      runValidator: true,
     },
   );
 
