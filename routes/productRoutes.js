@@ -7,7 +7,7 @@ const {
 } = require("../utils/validators/productValidator");
 
 const {
-  getProducts,
+  getAllProducts,
   getProduct,
   createProduct,
   updateProduct,
@@ -20,7 +20,7 @@ const router = express.Router();
 
 router
   .route("/")
-  .get(getProducts)
+  .get(getAllProducts)
   .post(
     uploadProductsImages,
     resizeProductsImages,

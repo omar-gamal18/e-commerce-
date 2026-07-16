@@ -40,7 +40,7 @@ exports.resizeProductsImages = async (req, res, next) => {
   next();
 };
 
-exports.getProducts = Factory.getAll(Product, "Products");
+exports.getAllProducts = Factory.getAll(Product, "Products");
 exports.getProduct = Factory.getOne(Product);
 exports.createProduct = Factory.createOne(Product);
 exports.updateProduct = Factory.updateOne(Product);

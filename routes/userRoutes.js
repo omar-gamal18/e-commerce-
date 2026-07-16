@@ -7,7 +7,7 @@ const express = require("express");
 //} = require("../utils/validators/UserValidator");
 
 const {
-  getUsers,
+  getAllUsers,
   getUser,
   createUser,
   updateUser,
@@ -18,7 +18,10 @@ const {
 
 const router = express.Router();
 
-router.route("/").get(getUsers).post(uploadUserImage, resizeImage, createUser);
+router
+  .route("/")
+  .get(getAllUsers)
+  .post(uploadUserImage, resizeImage, createUser);
 router
   .route("/:id")
   .get(getUser)
