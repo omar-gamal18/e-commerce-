@@ -4,17 +4,19 @@ const { uploadSingleImage } = require("../middlewares/uploadImageMiddleware");
 const Factory = require("./handlersFactory");
 const User = require("../models/userModel");
 
-exports.uploadUserImage = uploadSingleImage("image");
+exports.uploadUserImage = uploadSingleImage("profileImg");
 
 exports.resizeImage = async (req, res, next) => {
   const fileName = `user-${Date.now()}.jpeg`;
-  await sharp(req.file.buffer)
-    .resize(600, 600)
-    .toFormat("jpeg")
-    .jpeg({ quality: 90 })
-    .toFile(`uploads/users/${fileName}`);
+  if (req.file) {
+    await sharp(req.file.buffer)
+      .resize(600, 600)
+      .toFormat("jpeg")
+      .jpeg({ quality: 90 })
+      .toFile(`uploads/users/${fileName}`);
 
-  req.body.profileImg = fileName;
+    req.body.profileImg = fileName;
+  }
   next();
 };
 
