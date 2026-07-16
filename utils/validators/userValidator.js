@@ -6,7 +6,7 @@ const User = require("../../models/userModel");
 exports.createUserValidator = [
   check("name")
     .notEmpty()
-    .withMessage("User required")
+    .withMessage("Username required")
     .isLength({ min: 3 })
     .withMessage("Too short User name")
     .custom((val, { req }) => {
