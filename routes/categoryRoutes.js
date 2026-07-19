@@ -19,6 +19,8 @@ const {
   resizeImage,
 } = require("../controllers/categoryController");
 
+const authController = require("../controllers/authContoller");
+
 const router = express.Router();
 
 router.use("/:categoryId/subcategories", subCategoryRouter);
@@ -27,6 +29,8 @@ router
   .route("/")
   .get(getAllCategories)
   .post(
+    authController.protect,
+    authController.allowedTo("admin"),
     createCategoryValidator,
     uploadCategoryImage,
     resizeImage,
@@ -37,11 +41,18 @@ router
   .route("/:id")
   .get(getCategoryValidator, getCategory)
   .patch(
+    authController.protect,
+    authController.allowedTo("admin"),
     updateCategoryValidator,
     uploadCategoryImage,
     resizeImage,
     updateCategory,
   )
-  .delete(deleteCategoryValidator, deleteCategory);
+  .delete(
+    authController.protect,
+    authController.allowedTo("admin"),
+    deleteCategoryValidator,
+    deleteCategory,
+  );
 
 module.exports = router;

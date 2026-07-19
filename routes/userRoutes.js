@@ -18,22 +18,49 @@ const {
   resizeImage,
 } = require("../controllers/userController");
 
+const authController = require("../controllers/authContoller");
+
 const router = express.Router();
 
 router.patch(
   "/changeMyPassword/:id",
+  authController.protect,
   changeUserPasswordValidator,
   changeUserPassword,
 );
 
 router
   .route("/")
-  .get(getAllUsers)
-  .post(createUserValidator, uploadUserImage, resizeImage, createUser);
+  .get(authController.protect, authController.allowedTo("admin"), getAllUsers)
+  .post(
+    authController.protect,
+    authController.allowedTo("admin"),
+    createUserValidator,
+    uploadUserImage,
+    resizeImage,
+    createUser,
+  );
 router
   .route("/:id")
-  .get(getUserValidator, getUser)
-  .patch(updateUserValidator, uploadUserImage, resizeImage, updateUser)
-  .delete(deleteUserValidator, deleteUser);
+  .get(
+    authController.protect,
+    authController.allowedTo("admin"),
+    getUserValidator,
+    getUser,
+  )
+  .patch(
+    authController.protect,
+    authController.allowedTo("admin"),
+    updateUserValidator,
+    uploadUserImage,
+    resizeImage,
+    updateUser,
+  )
+  .delete(
+    authController.protect,
+    authController.allowedTo("admin"),
+    deleteUserValidator,
+    deleteUser,
+  );
 
 module.exports = router;
