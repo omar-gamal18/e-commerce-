@@ -51,7 +51,7 @@ exports.updateUser = async (req, res, next) => {
 };
 
 exports.changeUserPassword = async (req, res, next) => {
-  const document = await User.findByIdAndUpdate(
+  const user = await User.findByIdAndUpdate(
     req.params.id,
     {
       password: await bcrypt.hash(req.body.password, 12),
@@ -63,8 +63,8 @@ exports.changeUserPassword = async (req, res, next) => {
     },
   );
 
-  if (!document) {
-    return next(new ApiError(`No document for this id ${req.params.id}`, 404));
+  if (!user) {
+    return next(new ApiError(`No user for this id ${req.params.id}`, 404));
   }
-  res.status(200).json({ data: document });
+  res.status(200).json({ data: user });
 };
