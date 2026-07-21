@@ -113,7 +113,7 @@ exports.allowedTo =
     next();
   };
 
-exports.forgetPassword = async (req, res, next) => {
+exports.forgotPassword = async (req, res, next) => {
   const user = await User.findOne({ email: req.body.email });
   if (!user) {
     return next(new ApiError("There is no user with this email", 404));
@@ -136,6 +136,26 @@ exports.forgetPassword = async (req, res, next) => {
     subject: "reset your password",
     message: `your password reset key is:${randomCode}`,
   });
+
+  res.status(200).json({ status: "success" });
+};
+
+exports.verifyPassResetPassword = async (req, res, next) => {
+  const hashedResetCode = crypto
+    .createHash("sha256")
+    .update(req.body.resetCode)
+    .digest("hex");
+
+  const user = await User.findOne({
+    passwordResetCode: hashedResetCode,
+    passwordResetCodeExpires: { $gt: Date.now() },
+  });
+
+  if (!user) {
+    return next(new ApiError("Reset code invalid or expired", 400));
+  }
+
+  req.body.passwordResetVerefied = true;
 
   res.status(200).json({ status: "success" });
 };
