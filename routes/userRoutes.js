@@ -19,64 +19,36 @@ const {
   getLoggedUserData,
   updateLoggedUserPassword,
   updateLoggedUserData,
+  deleteLoggedUserData,
 } = require("../controllers/userController");
 
 const authController = require("../controllers/authContoller");
 
 const router = express.Router();
 
-router.get("/getMe", authController.protect, getLoggedUserData, getUser);
-router.patch(
-  "/updateMyPassword",
-  authController.protect,
-  updateLoggedUserPassword,
-);
-router.patch(
-  "/updateMe",
-  authController.protect,
-  updateUserValidator,
-  updateLoggedUserData,
-);
+router.use(authController.protect);
+
+router.get("/getMe", getLoggedUserData, getUser);
+router.patch("/updateMyPassword", updateLoggedUserPassword);
+router.patch("/updateMe", updateUserValidator, updateLoggedUserData);
+router.delete("/deleteMe", deleteLoggedUserData);
 
 router.patch(
   "/changePassword/:id",
-  authController.protect,
   changeUserPasswordValidator,
   changeUserPassword,
 );
 
+router.use(authController.allowedTo("admin"));
+
 router
   .route("/")
-  .get(authController.protect, authController.allowedTo("admin"), getAllUsers)
-  .post(
-    authController.protect,
-    authController.allowedTo("admin"),
-    createUserValidator,
-    uploadUserImage,
-    resizeImage,
-    createUser,
-  );
+  .get(getAllUsers)
+  .post(createUserValidator, uploadUserImage, resizeImage, createUser);
 router
   .route("/:id")
-  .get(
-    authController.protect,
-    authController.allowedTo("admin"),
-    getUserValidator,
-    getUser,
-  )
-  .patch(
-    authController.protect,
-    authController.allowedTo("admin"),
-    updateUserValidator,
-    uploadUserImage,
-    resizeImage,
-    updateUser,
-  )
-  .delete(
-    authController.protect,
-    authController.allowedTo("admin"),
-    deleteUserValidator,
-    deleteUser,
-  );
+  .get(getUserValidator, getUser)
+  .patch(updateUserValidator, uploadUserImage, resizeImage, updateUser)
+  .delete(deleteUserValidator, deleteUser);
 
 module.exports = router;
