@@ -126,10 +126,10 @@ exports.forgotPassword = async (req, res, next) => {
     .digest("hex");
 
   user.passwordResetCode = hashedResetCode;
-  user.passwordResetCodeExpires = Date.now() + 3 * 60 * 1000;
+  user.passwordResetCodeExpires = Date.now() + 10 * 60 * 1000;
   user.passwordResetVerefied = false;
 
-  await user.save;
+  await user.save();
 
   await sendEmail({
     email: user.email,
@@ -155,7 +155,8 @@ exports.verifyPassResetPassword = async (req, res, next) => {
     return next(new ApiError("Reset code invalid or expired", 400));
   }
 
-  req.body.passwordResetVerefied = true;
+  user.passwordResetVerefied = true;
+  await user.save();
 
   res.status(200).json({ status: "success" });
 };
