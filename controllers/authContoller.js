@@ -1,3 +1,5 @@
+const crypto = require("crypto");
+
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
@@ -109,3 +111,22 @@ exports.allowedTo =
 
     next();
   };
+
+exports.forgetPassword = async (req, res, next) => {
+  const user = await User.findOne({ email: req.body.email });
+  if (!user) {
+    return next(new ApiError("There is no user with this email", 404));
+  }
+
+  const randomCode = Math.floor(100000 + Math.random() * 900000).toString();
+  const hashedResetCode = crypto
+    .createHash("sha256")
+    .update(randomCode)
+    .digest("hex");
+
+  user.passwordResetCode = hashedResetCode;
+  user.passwordResetCodeExpires = Date.now() + 3 * 60 * 1000;
+  user.passwordResetVerefied = false;
+
+  await user.save;
+};
