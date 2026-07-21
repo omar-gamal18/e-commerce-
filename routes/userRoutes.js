@@ -5,6 +5,7 @@ const {
   updateUserValidator,
   deleteUserValidator,
   changeUserPasswordValidator,
+  updateLoggedUserDataValidator,
 } = require("../utils/validators/userValidator");
 
 const {
@@ -30,16 +31,16 @@ router.use(authController.protect);
 
 router.get("/getMe", getLoggedUserData, getUser);
 router.patch("/updateMyPassword", updateLoggedUserPassword);
-router.patch("/updateMe", updateUserValidator, updateLoggedUserData);
+router.patch("/updateMe", updateLoggedUserDataValidator, updateLoggedUserData);
 router.delete("/deleteMe", deleteLoggedUserData);
+
+router.use(authController.allowedTo("admin"));
 
 router.patch(
   "/changePassword/:id",
   changeUserPasswordValidator,
   changeUserPassword,
 );
-
-router.use(authController.allowedTo("admin"));
 
 router
   .route("/")
