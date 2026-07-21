@@ -16,14 +16,30 @@ const {
   deleteUser,
   uploadUserImage,
   resizeImage,
+  getLoggedUserData,
+  updateLoggedUserPassword,
+  updateLoggedUserData,
 } = require("../controllers/userController");
 
 const authController = require("../controllers/authContoller");
 
 const router = express.Router();
 
+router.get("/getMe", authController.protect, getLoggedUserData, getUser);
 router.patch(
-  "/changeMyPassword/:id",
+  "/updateMyPassword",
+  authController.protect,
+  updateLoggedUserPassword,
+);
+router.patch(
+  "/updateMe",
+  authController.protect,
+  updateUserValidator,
+  updateLoggedUserData,
+);
+
+router.patch(
+  "/changePassword/:id",
   authController.protect,
   changeUserPasswordValidator,
   changeUserPassword,

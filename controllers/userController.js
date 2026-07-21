@@ -1,10 +1,16 @@
 const sharp = require("sharp");
 const bcrypt = require("bcryptjs");
+const jwt = require("jsonwebtoken");
 
 const ApiError = require("../utils/apiError");
 const { uploadSingleImage } = require("../middlewares/uploadImageMiddleware");
 const Factory = require("./handlersFactory");
 const User = require("../models/userModel");
+
+const signToken = (payload) =>
+  jwt.sign({ userId: payload }, process.env.JWT_SECRET_KEY, {
+    expiresIn: process.env.JWT_EXPIRESIN,
+  });
 
 exports.uploadUserImage = uploadSingleImage("profileImg");
 
@@ -67,4 +73,42 @@ exports.changeUserPassword = async (req, res, next) => {
     return next(new ApiError(`No user for this id ${req.params.id}`, 404));
   }
   res.status(200).json({ data: user });
+};
+
+exports.getLoggedUserData = async (req, res, next) => {
+  req.params.id = req.user._id;
+  next();
+};
+
+exports.updateLoggedUserPassword = async (req, res, next) => {
+  const user = await User.findByIdAndUpdate(
+    req.user._id,
+    {
+      password: await bcrypt.hash(req.body.password, 12),
+      passwordChangedAt: Date.now(),
+    },
+    {
+      new: true,
+      runValidator: true,
+    },
+  );
+
+  const token = signToken(user._id);
+  res.status(200).json({ data: user, token });
+};
+
+exports.updateLoggedUserData = async (req, res, next) => {
+  const loggedUser = await User.findByIdAndUpdate(
+    req.user._id,
+    {
+      name: req.body.name,
+      phone: req.body.phone,
+      email: req.body.email,
+    },
+    {
+      new: true,
+      runValidator: true,
+    },
+  );
+  res.status(200).json({ data: loggedUser });
 };
