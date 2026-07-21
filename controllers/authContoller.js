@@ -4,6 +4,7 @@ const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 
 const ApiError = require("../utils/apiError");
+const sendEmail = require("../utils/email");
 const User = require("../models/userModel");
 
 const signToken = (payload) =>
@@ -129,4 +130,12 @@ exports.forgetPassword = async (req, res, next) => {
   user.passwordResetVerefied = false;
 
   await user.save;
+
+  await sendEmail({
+    email: user.email,
+    subject: "reset your password",
+    message: `your password reset key is:${randomCode}`,
+  });
+
+  res.status(200).json({ status: "success" });
 };
