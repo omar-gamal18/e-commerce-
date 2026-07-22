@@ -13,19 +13,22 @@ const {
   createReview,
   updateReview,
   deleteReview,
+  setproductIdToBody,
+  createFilterObj,
 } = require("../controllers/reviewController");
 
 const authController = require("../controllers/authContoller");
 
-const router = express.Router();
+const router = express.Router({ mergeParams: true });
 
 router
   .route("/")
-  .get(getReviews)
+  .get(createFilterObj, getReviews)
   .post(
     authController.protect,
-    createReviewValidator,
     authController.allowedTo("user"),
+    setproductIdToBody,
+    createReviewValidator,
     createReview,
   );
 router

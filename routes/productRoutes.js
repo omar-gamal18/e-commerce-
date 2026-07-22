@@ -1,4 +1,5 @@
 const express = require("express");
+
 const {
   getProductValidator,
   createProductValidator,
@@ -17,8 +18,11 @@ const {
 } = require("../controllers/productController");
 
 const authController = require("../controllers/authContoller");
+const reviewRoutes = require("./reviewRoutes");
 
 const router = express.Router();
+
+router.use("/:productId/reviews", reviewRoutes);
 
 router
   .route("/")

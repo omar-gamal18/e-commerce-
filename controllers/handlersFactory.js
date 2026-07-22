@@ -27,8 +27,14 @@ exports.getAll =
     });
   };
 
-exports.getOne = (Model) => async (req, res, next) => {
-  const document = await Model.findById(req.params.id);
+exports.getOne = (Model, populateOpt) => async (req, res, next) => {
+  let query = Model.findById(req.params.id);
+
+  if (populateOpt) {
+    query = query.populate(populateOpt);
+  }
+
+  const document = await query;
 
   if (!document) {
     return next(new ApiError("No document With This Id", 404));
