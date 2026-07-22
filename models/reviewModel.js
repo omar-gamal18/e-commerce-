@@ -59,6 +59,19 @@ reviewSchema.post("save", function () {
   this.constructor.calcAverageRatingsAndQuantity(this.product);
 });
 
+reviewSchema.pre(/^findOneAnd/, async function (next) {
+  this.review = await this.model.findOne(this.getQuery());
+  next();
+});
+
+reviewSchema.post(/^findOneAnd/, async function () {
+  if (this.review) {
+    await this.review.constructor.calcAverageRatingsAndQuantity(
+      this.review.product,
+    );
+  }
+});
+
 reviewSchema.pre(/^find/, function () {
   this.populate({ path: "user", select: "name -_id" });
 });
