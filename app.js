@@ -6,16 +6,7 @@ const morgan = require("morgan");
 require("dotenv").config();
 const globalError = require("./middlewares/errorMiddleware");
 const ApiError = require("./utils/apiError");
-
-const categoryRouter = require("./routes/categoryRoutes");
-const subCategoryRouter = require("./routes/subCategoryRoutes");
-const brandRoute = require("./routes/brandRoutes");
-const productRoute = require("./routes/productRoutes");
-const reviewRoute = require("./routes/reviewRoutes");
-const userRoute = require("./routes/userRoutes");
-const wishlistRoute = require("./routes/wishlistRoutes");
-const addressRoute = require("./routes/addressRoutes");
-const authRote = require("./routes/authRotes");
+const mountRoutes = require("./routes");
 
 const app = express();
 app.set("query parser", "extended");
@@ -27,15 +18,7 @@ if (process.env.NODE_ENV === "development") {
   console.log(`mode: ${process.env.NODE_ENV}`);
 }
 
-app.use("/api/v1/categories", categoryRouter);
-app.use("/api/v1/subcategories", subCategoryRouter);
-app.use("/api/v1/brands", brandRoute);
-app.use("/api/v1/products", productRoute);
-app.use("/api/v1/users", userRoute);
-app.use("/api/v1/auth", authRote);
-app.use("/api/v1/reviews", reviewRoute);
-app.use("/api/v1/wishlists", wishlistRoute);
-app.use("/api/v1/address", addressRoute);
+mountRoutes(app);
 
 app.all("/*handle404", (req, res, next) => {
   next(new ApiError("cann't find this route", 404));
