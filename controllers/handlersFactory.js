@@ -54,7 +54,7 @@ exports.createOne = (Model) => async (req, res) => {
 exports.updateOne = (Model) => async (req, res, next) => {
   const document = await Model.findByIdAndUpdate(req.params.id, req.body, {
     new: true,
-    runValidator: true,
+    runValidators: true,
   });
 
   if (!document) {
