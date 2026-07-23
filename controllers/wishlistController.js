@@ -60,3 +60,14 @@ exports.removeProductFromWishlist = async (req, res, next) => {
     },
   });
 };
+
+exports.getLoggedUserWishlist = async (req, res, next) => {
+  const user = await User.findById(req.user._id).populate("wishList");
+
+  res.status(200).json({
+    status: "success",
+    results: user.wishList.length,
+    data: user.wishList,
+  });
+};
+
