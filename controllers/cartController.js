@@ -40,7 +40,6 @@ exports.addProductToCart = async (req, res, next) => {
   }
 
   cart.totalPrice = calcTotalPrise(cart);
-
   await cart.save();
 
   res.status(200).json({
@@ -63,6 +62,7 @@ exports.getLoggedUserCart = async (req, res, next) => {
     status: "success",
     data: {
       shoppingCart: cart.cartItems,
+      totalPrice: calcTotalPrise(cart),
     },
   });
 };
@@ -86,6 +86,48 @@ exports.removeSpecificCartItem = async (req, res, next) => {
   res.status(200).json({
     status: "success",
     message: "Item removed from cart",
+    numOfCartItems: cart.cartItems.length,
+    totalPrice: cart.totalPrice,
+    data: cart,
+  });
+};
+
+exports.clearCart = async (req, res, next) => {
+  const cart = await Cart.findOneAndDelete({ user: req.user._id });
+
+  if (!cart) {
+    return next(new ApiError("Cart not found", 404));
+  }
+
+  res.status(204).send();
+};
+
+exports.updateCartItemQuantity = async (req, res, next) => {
+  const { quantity } = req.body;
+
+  const cart = await Cart.findOne({ user: req.user._id });
+  if (!cart) {
+    return next(new ApiError(`there is no cart for user ${req.user._id}`, 404));
+  }
+
+  const itemIndex = cart.cartItems.findIndex(
+    (item) => item._id.toString() === req.params.itemId,
+  );
+  if (itemIndex > -1) {
+    const cartItem = cart.cartItems[itemIndex];
+    cartItem.quantity = quantity;
+    cart.cartItems[itemIndex] = cartItem;
+  } else {
+    return next(
+      new ApiError(`there is no item for this id :${req.params.itemId}`, 404),
+    );
+  }
+
+  cart.totalPrice = calcTotalPrise(cart);
+  await cart.save();
+
+  res.status(200).json({
+    status: "success",
     numOfCartItems: cart.cartItems.length,
     totalPrice: cart.totalPrice,
     data: cart,
