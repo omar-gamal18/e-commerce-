@@ -147,14 +147,15 @@ exports.applyCoupon = async (req, res, next) => {
 
   const cart = await Cart.findOne({ user: req.user._id });
 
-  const totalPrice = cart.totalCartPrice;
+  const { totalPrice } = cart;
 
   const totalPriceAfterDiscount = (
     totalPrice -
     (totalPrice * coupon.discount) / 100
   ).toFixed(2); // 99.23
 
-  cart.totalPriceAfterDiscount = totalPriceAfterDiscount;
+  cart.totalPriceAfterDiscount = +totalPriceAfterDiscount;
+
   await cart.save();
 
   res.status(200).json({
