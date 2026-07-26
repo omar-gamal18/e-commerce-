@@ -9,7 +9,7 @@ exports.createCashOrder = async (req, res, next) => {
   const taxPrice = 0;
   const shippingPrice = 0;
   // 1) Get cart depend on cartId
-  const cart = await Cart.findById(req.params.id);
+  const cart = await Cart.findById(req.params.cartId);
   if (!cart) {
     return next(new ApiError("no cart found with this id", 404));
   }
@@ -27,12 +27,14 @@ exports.createCashOrder = async (req, res, next) => {
 
   if (order) {
     const bulkOpts = cart.cartItems.map((item) => ({
-      filter: {
-        _id: item.Product,
-        quantity: { $gte: item.quantity },
-      },
       updateOne: {
-        $inc: { quantity: -item.quantity, sold: item.quantity },
+        filter: {
+          _id: item.product,
+          quantity: { $gte: item.quantity },
+        },
+        update: {
+          $inc: { quantity: -item.quantity, sold: item.quantity },
+        },
       },
     }));
 
@@ -46,3 +48,6 @@ exports.createCashOrder = async (req, res, next) => {
     data: order,
   });
 };
+
+exports.getOrder = factory.getOne(Order);
+exports.getAllOrders = factory.getAll(Order);

@@ -62,8 +62,7 @@ exports.getLoggedUserCart = async (req, res, next) => {
   res.status(200).json({
     status: "success",
     data: {
-      shoppingCart: cart.cartItems,
-      totalPrice: calcTotalPrise(cart),
+      shoppingCart: cart,
     },
   });
 };
