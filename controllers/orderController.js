@@ -1,4 +1,4 @@
-const stripe = require("stripe");
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
 const factory = require("./handlersFactory");
 const ApiError = require("../utils/apiError");
@@ -128,16 +128,27 @@ exports.checkoutSession = async (req, res, next) => {
 
   const cartPrice = cart.totalPriceAfterDiscount
     ? cart.totalPriceAfterDiscount
-    : cart.totalCartPrice;
+    : cart.totalPrice;
+
+  console.log({
+    cartPrice,
+    totalPriceAfterDiscount: cart.totalPriceAfterDiscount,
+    totalCartPrice: cart.totalPrice,
+  });
 
   const totalOrderPrice = cartPrice + taxPrice + shippingPrice;
+  console.log({ totalOrderPrice });
 
   const session = await stripe.checkout.sessions.create({
     line_items: [
       {
-        name: req.user.name,
-        amount: totalOrderPrice * 100,
-        currency: "egp",
+        price_data: {
+          currency: "egp",
+          unit_amount: Math.round(totalOrderPrice * 100),
+          product_data: {
+            name: req.user.name,
+          },
+        },
         quantity: 1,
       },
     ],
@@ -146,7 +157,7 @@ exports.checkoutSession = async (req, res, next) => {
     cancel_url: `${req.protocol}://${req.get("host")}/cart`,
     customer_email: req.user.email,
     client_reference_id: req.params.cartId,
-    metadata: req.body.shippingAddress,
+    metadata: req.body.shippingAddress || {},
   });
 
   res.status(200).json({ status: "success", session });
