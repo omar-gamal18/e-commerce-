@@ -8,7 +8,7 @@ const Order = require("../models/orderModel");
 exports.createCashOrder = async (req, res, next) => {
   const taxPrice = 0;
   const shippingPrice = 0;
-  // 1) Get cart depend on cartId
+
   const cart = await Cart.findById(req.params.cartId);
   if (!cart) {
     return next(new ApiError("no cart found with this id", 404));
@@ -49,5 +49,28 @@ exports.createCashOrder = async (req, res, next) => {
   });
 };
 
-exports.getOrder = factory.getOne(Order);
+exports.getOrder = async (req, res, next) => {
+  const filter = { _id: req.params.id };
+
+  if (req.user.role === "user") {
+    filter.user = req.user._id;
+  }
+
+  const document = await Order.findOne(filter);
+
+  if (!document) {
+    return next(new ApiError("No order found with this id", 404));
+  }
+
+  res.status(200).json({
+    status: "success",
+    data: { document },
+  });
+};
+
+exports.filterOrderForLoggedUser = async (req, res, next) => {
+  if (req.user.role === "user") req.filterObj = { user: req.user._id };
+  next();
+};
+
 exports.getAllOrders = factory.getAll(Order);

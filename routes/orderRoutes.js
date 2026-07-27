@@ -4,17 +4,25 @@ const {
   createCashOrder,
   getOrder,
   getAllOrders,
+  filterOrderForLoggedUser,
 } = require("../controllers/orderController");
 
 const authController = require("../controllers/authContoller");
 
 const router = express.Router();
 
-router.use(authController.protect, authController.allowedTo("user"));
+router.use(authController.protect);
 
-router.get("/getAllOrders", getAllOrders);
-router.route("/:id").get(getOrder);
+router.get(
+  "/",
+  authController.allowedTo("user", "admin"),
+  filterOrderForLoggedUser,
+  getAllOrders,
+);
+router.route("/:id").get(authController.allowedTo("user", "admin"), getOrder);
 
-router.route("/:cartId").post(createCashOrder);
+router
+  .route("/:cartId")
+  .post(authController.allowedTo("user"), createCashOrder);
 
 module.exports = router;
