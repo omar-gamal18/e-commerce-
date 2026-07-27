@@ -5,6 +5,8 @@ const {
   getOrder,
   getAllOrders,
   filterOrderForLoggedUser,
+  updateOrderToPaid,
+  updateOrderToDelivered,
 } = require("../controllers/orderController");
 
 const authController = require("../controllers/authContoller");
@@ -24,5 +26,9 @@ router.route("/:id").get(authController.allowedTo("user", "admin"), getOrder);
 router
   .route("/:cartId")
   .post(authController.allowedTo("user"), createCashOrder);
+
+router.use(authController.allowedTo("admin"));
+router.patch("/:id/pay", updateOrderToPaid);
+router.patch("/:id/deliver", updateOrderToDelivered);
 
 module.exports = router;

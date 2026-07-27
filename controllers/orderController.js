@@ -56,15 +56,15 @@ exports.getOrder = async (req, res, next) => {
     filter.user = req.user._id;
   }
 
-  const document = await Order.findOne(filter);
+  const order = await Order.findOne(filter);
 
-  if (!document) {
+  if (!order) {
     return next(new ApiError("No order found with this id", 404));
   }
 
   res.status(200).json({
     status: "success",
-    data: { document },
+    data: { order },
   });
 };
 
@@ -74,3 +74,41 @@ exports.filterOrderForLoggedUser = async (req, res, next) => {
 };
 
 exports.getAllOrders = factory.getAll(Order);
+
+exports.updateOrderToPaid = async (req, res, next) => {
+  const order = await Order.findById(req.params.id);
+  if (!order) {
+    return next(
+      new ApiError(
+        `There is no such a order with this id:${req.params.id}`,
+        404,
+      ),
+    );
+  }
+
+  order.isPaid = true;
+  order.paidAt = Date.now();
+
+  const updatedOrder = await order.save();
+
+  res.status(200).json({ status: "success", data: updatedOrder });
+};
+
+exports.updateOrderToDelivered = async (req, res, next) => {
+  const order = await Order.findById(req.params.id);
+  if (!order) {
+    return next(
+      new ApiError(
+        `There is no such a order with this id:${req.params.id}`,
+        404,
+      ),
+    );
+  }
+
+  order.isDelivered = true;
+  order.deliveredAt = Date.now();
+
+  const updatedOrder = await order.save();
+
+  res.status(200).json({ status: "success", data: updatedOrder });
+};
