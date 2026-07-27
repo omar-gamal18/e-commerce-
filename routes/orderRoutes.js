@@ -7,6 +7,7 @@ const {
   filterOrderForLoggedUser,
   updateOrderToPaid,
   updateOrderToDelivered,
+  checkoutSession,
 } = require("../controllers/orderController");
 
 const authController = require("../controllers/authContoller");
@@ -14,6 +15,12 @@ const authController = require("../controllers/authContoller");
 const router = express.Router();
 
 router.use(authController.protect);
+
+router.get(
+  "/checkout-session/:cartId",
+  authController.allowedTo("user"),
+  checkoutSession,
+);
 
 router.get(
   "/",
