@@ -1,4 +1,14 @@
-const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
+let stripe;
+const getStripe = () => {
+  if (!stripe) {
+    const key = process.env.STRIPE_SECRET_KEY;
+    if (!key) {
+      throw new Error("Stripe API key is not configured.");
+    }
+    stripe = require("stripe")(key);
+  }
+  return stripe;
+};
 
 const factory = require("./handlersFactory");
 const ApiError = require("../utils/apiError");
@@ -138,6 +148,13 @@ exports.checkoutSession = async (req, res, next) => {
 
   const totalOrderPrice = cartPrice + taxPrice + shippingPrice;
   console.log({ totalOrderPrice });
+
+  let stripe;
+  try {
+    stripe = getStripe();
+  } catch (err) {
+    return next(new ApiError(err.message, 500));
+  }
 
   const session = await stripe.checkout.sessions.create({
     line_items: [

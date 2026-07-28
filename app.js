@@ -12,7 +12,7 @@ const mountRoutes = require("./routes");
 
 const app = express();
 app.use(cors());
-app.options("*", cors());
+app.options(/.*/, cors());
 
 app.use(compression());
 
@@ -27,7 +27,7 @@ if (process.env.NODE_ENV === "development") {
 
 mountRoutes(app);
 
-app.all("/*handle404", (req, res, next) => {
+app.all(/.*/, (req, res, next) => {
   next(new ApiError("cann't find this route", 404));
 });
 
