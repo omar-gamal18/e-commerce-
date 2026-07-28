@@ -1,14 +1,4 @@
-let stripe;
-const getStripe = () => {
-  if (!stripe) {
-    const key = process.env.STRIPE_SECRET_KEY;
-    if (!key) {
-      throw new Error("Stripe API key is not configured.");
-    }
-    stripe = require("stripe")(key);
-  }
-  return stripe;
-};
+const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
 const factory = require("./handlersFactory");
 const ApiError = require("../utils/apiError");
@@ -149,13 +139,6 @@ exports.checkoutSession = async (req, res, next) => {
   const totalOrderPrice = cartPrice + taxPrice + shippingPrice;
   console.log({ totalOrderPrice });
 
-  let stripe;
-  try {
-    stripe = getStripe();
-  } catch (err) {
-    return next(new ApiError(err.message, 500));
-  }
-
   const session = await stripe.checkout.sessions.create({
     line_items: [
       {
@@ -178,4 +161,26 @@ exports.checkoutSession = async (req, res, next) => {
   });
 
   res.status(200).json({ status: "success", session });
+};
+
+exports.webhookCheckout = async (req, res, next) => {
+  const sig = req.headers["stripe-signature"];
+  let event;
+
+  try {
+    event = stripe.webhooks.constructEvent(
+      req.body,
+      sig,
+      process.env.STRIPE_WEBHOOK_SECRET,
+    );
+  } catch (err) {
+    return res.status(400).send(`Webhook error: ${err.message}`);
+  }
+
+  if (event.type === "checkout.session.completed") {
+    console.log("checkout.session.completed");
+    //const session = event.data.object;
+    //const cartId = session.client_reference_id;
+    //const shippingAddress = session.metadata;
+  }
 };

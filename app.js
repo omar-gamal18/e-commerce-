@@ -9,12 +9,19 @@ require("dotenv").config();
 const globalError = require("./middlewares/errorMiddleware");
 const ApiError = require("./utils/apiError");
 const mountRoutes = require("./routes");
+const { webhookCheckout } = require("./controllers/orderController");
 
 const app = express();
 app.use(cors());
 app.options(/.*/, cors());
 
 app.use(compression());
+
+app.post(
+  "/webhook-checkout",
+  express.raw({ type: "application/json" }),
+  webhookCheckout,
+);
 
 app.set("query parser", "extended");
 app.use(express.json());

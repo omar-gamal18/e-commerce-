@@ -30,5 +30,3 @@ process.on("unhandledRejection", (err) => {
     process.exit(1);
   });
 });
-
-console.log("Stripe key:", process.env.STRIPE_SECRET_KEY);
