@@ -7,6 +7,10 @@ require("dotenv").config();
 const app = require("./app");
 
 const database = process.env.DB;
+if (!database) {
+  console.error("CRITICAL ERROR: DB environment variable is not defined.");
+  process.exit(1);
+}
 
 mongoose.connect(database).then(() => {
   console.log("DB connected");
