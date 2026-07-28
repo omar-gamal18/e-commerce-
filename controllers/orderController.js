@@ -2,6 +2,7 @@ const stripe = require("stripe")(process.env.STRIPE_SECRET_KEY);
 
 const factory = require("./handlersFactory");
 const ApiError = require("../utils/apiError");
+const User = require("../models/userModel");
 const Product = require("../models/productModel");
 const Cart = require("../models/cartModel");
 const Order = require("../models/orderModel");
@@ -163,24 +164,45 @@ exports.checkoutSession = async (req, res, next) => {
   res.status(200).json({ status: "success", session });
 };
 
+const createCardOrder = async (session) => {
+  const cartId = session.client_reference_id;
+  const shippingAddress = session.metadata;
+  const orderPrice = session.amount_total / 100;
+
+  const cart = await Cart.findById(cartId);
+  if (!cart) return;
+
+  const user = await User.findOne({ email: session.customer_email });
+  if (!user) return;
+
+  await Order.create({
+    user: user._id,
+    cartItems: cart.cartItems,
+    shippingAddress,
+    totalOrderPrice: orderPrice,
+    isPaid: true,
+    paidAt: Date.now(),
+    paymentMethodType: "card",
+  });
+};
+
 exports.webhookCheckout = async (req, res, next) => {
-  const sig = req.headers["stripe-signature"];
+  const signature = req.headers["stripe-signature"];
+  const payload = req.rawBody || req.body;
+
   let event;
 
   try {
-    event = stripe.webhooks.constructEvent(
-      req.body,
-      sig,
-      process.env.STRIPE_WEBHOOK_SECRET,
-    );
+    const webhookSecret =
+      process.env.STRIPE_WEBHOOK_SECRET || process.env.WEBHOOK_SECRET;
+    event = stripe.webhooks.constructEvent(payload, signature, webhookSecret);
   } catch (err) {
-    return res.status(400).send(`Webhook error: ${err.message}`);
+    return res.status(400).send(`Webhook Error: ${err.message}`);
   }
 
   if (event.type === "checkout.session.completed") {
-    console.log("checkout.session.completed");
-    //const session = event.data.object;
-    //const cartId = session.client_reference_id;
-    //const shippingAddress = session.metadata;
+    await createCardOrder(event.data.object);
   }
+
+  res.status(200).json({ received: true });
 };
