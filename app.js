@@ -6,6 +6,8 @@ const cors = require("cors");
 const compression = require("compression");
 const rateLimit = require("express-rate-limit");
 const hpp = require("hpp");
+const mongoSanitize = require("express-mongo-sanitize");
+const xss = require("xss-clean");
 
 require("dotenv").config();
 const globalError = require("./middlewares/errorMiddleware");
@@ -30,6 +32,9 @@ if (process.env.NODE_ENV === "development") {
   app.use(morgan("dev"));
   console.log(`mode: ${process.env.NODE_ENV}`);
 }
+
+app.use(mongoSanitize());
+app.use(xss());
 
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
