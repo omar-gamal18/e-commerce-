@@ -168,7 +168,6 @@ Performs a case-insensitive regular expression search across specific fields.
 ## 🗄️ Database Models
 
 ### Entity Relationships Outline
-```mermaid
 erDiagram
     USER ||--o{ ORDER : places
     USER ||--o{ REVIEW : writes
